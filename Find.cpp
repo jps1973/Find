@@ -291,12 +291,6 @@ LRESULT CALLBACK MainWndProc( HWND hWndMain, UINT uMessage, WPARAM wParam, LPARA
 		case WM_NOTIFY:
 		{
 			// A notify message
-			LPNMHDR lpNmHdr;
-
-			// Get notify message handler
-			lpNmHdr = ( LPNMHDR )lParam;
-
-			// Source window is lpNmHdr->hwndFrom
 
 			// Call default procedure
 			lr = DefWindowProc( hWndMain, uMessage, wParam, lParam );
@@ -404,6 +398,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPTSTR, int nCmdShow )
 
 			// Allocate string memory
 			LPTSTR lpszFolderPath		= new char[ STRING_LENGTH ];
+			LPTSTR lpszFileFilter		= new char[ STRING_LENGTH ];
 			LPTSTR lpszStatusMessage	= new char[ STRING_LENGTH ];
 
 			// Get system menu
@@ -422,37 +417,45 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPTSTR, int nCmdShow )
 			if( lpszArgumentList )
 			{
 				// Successfully got argument list
-				int nWhichArgument;
-				int nSizeNeeded;
-				int nWideArgumentLength;
 
-				// Allocate string memory
-				LPTSTR lpszArgument = new char[ STRING_LENGTH ];
-
-				// Loop through arguments
-				for( nWhichArgument = 1; nWhichArgument < nArgumentCount; nWhichArgument ++ )
+				// See if file filter input parameter was provided
+				if( nArgumentCount > FILE_FILTER_INPUT_PARAMETER_NUMBER )
 				{
+					// File filter input parameter was provided
+					int nSizeNeeded;
+					int nWideArgumentLength;
+
 					// Get wide argument length
-					nWideArgumentLength = lstrlenW( lpszArgumentList[ nWhichArgument ] );
+					nWideArgumentLength = lstrlenW( lpszArgumentList[ FILE_FILTER_INPUT_PARAMETER_NUMBER ] );
 
 					// Get size required for argument
-					nSizeNeeded = WideCharToMultiByte( CP_UTF8, 0, lpszArgumentList[ nWhichArgument ], nWideArgumentLength, NULL, 0, NULL, NULL );
+					nSizeNeeded = WideCharToMultiByte( CP_UTF8, 0, lpszArgumentList[ FILE_FILTER_INPUT_PARAMETER_NUMBER ], nWideArgumentLength, NULL, 0, NULL, NULL );
 
-					// Convert argument to ansi
-					WideCharToMultiByte( CP_UTF8, 0, lpszArgumentList[ nWhichArgument ], nWideArgumentLength, lpszArgument, nSizeNeeded, NULL, NULL );
+					// Convert argument to ansi, and use as file filter
+					WideCharToMultiByte( CP_UTF8, 0, lpszArgumentList[ FILE_FILTER_INPUT_PARAMETER_NUMBER ], nWideArgumentLength, lpszFileFilter, nSizeNeeded, NULL, NULL );
 
-					// Terminate argument
-					lpszArgument[ nSizeNeeded ] = ( char )NULL;
+					// Terminate file filter
+					lpszFileFilter[ nSizeNeeded ] = ( char )NULL;
 
-					// Display argument
-					MessageBox( hWndMain, lpszArgument, INFORMATION_MESSAGE_CAPTION, ( MB_OK | MB_ICONINFORMATION ) );
+				} // End of file filter input parameter was provided
+				else
+				{
+					// File filter input parameter was not provided
 
-				}; // End of loop through arguments
+					// Use default file filter
+					lstrcpy( lpszFileFilter, ALL_FILES_FILTER );
 
-				// Free string memory
-				delete [] lpszArgument;
+				} // End of file filter input parameter was not provided
 
 			} // End of successfully got argument list
+			else
+			{
+				// Unable to get argument list
+
+				// Use default file filter
+				lstrcpy( lpszFileFilter, ALL_FILES_FILTER );
+
+			} // End of unable to get argument list
 
 			// Show main window
 			ShowWindow( hWndMain, nCmdShow );
@@ -464,7 +467,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPTSTR, int nCmdShow )
 			GetCurrentDirectory( STRING_LENGTH, lpszFolderPath );
 
 			// Populate list box window
-			nItemCount = ListBoxWindowPopulate( lpszFolderPath, ALL_FILES_FILTER, &StatusBarWindowSetText );
+			nItemCount = ListBoxWindowPopulate( lpszFolderPath, lpszFileFilter, &StatusBarWindowSetText );
 
 			// Format status message
 			wsprintf( lpszStatusMessage, LIST_BOX_WINDOW_POPULATE_STATUS_MESSAGE_FORMAT_STRING, lpszFolderPath, nItemCount );
@@ -485,6 +488,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPTSTR, int nCmdShow )
 
 			// Free string memory
 			delete [] lpszFolderPath;
+			delete [] lpszFileFilter;
 			delete [] lpszStatusMessage;
 
 		} // End of successfully created main window

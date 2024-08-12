@@ -32,6 +32,8 @@
 #define SYSTEM_MENU_ABOUT_ITEM_POSITION											6
 #define SYSTEM_MENU_ABOUT_ITEM_TEXT												"About"
 
+#define FILE_FILTER_INPUT_PARAMETER_NUMBER										1
+
 #define ABOUT_MESSAGE_TEXT														"Find\r\n"						\
 																				"\r\n"								\
 																				"Written by Jim Smith\r\n"			\

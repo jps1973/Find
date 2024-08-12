@@ -167,6 +167,8 @@ int ListBoxWindowPopulate( LPCTSTR lpszFolderPath, LPCTSTR lpszFileFilter, BOOL(
 
 	} // End of parent folder path does not end with a back-slash
 
+	// First, add files in the current folder
+
 	// Copy parent folder path into full search pattern
 	lstrcpy( lpszFullSearchPattern, lpszParentFolderPath );
 
@@ -175,6 +177,60 @@ int ListBoxWindowPopulate( LPCTSTR lpszFolderPath, LPCTSTR lpszFileFilter, BOOL(
 
 	// Show full search pattern as status
 	( *lpStatusFunction )( lpszParentFolderPath );
+
+	// Find first item
+	hFind = FindFirstFile( lpszFullSearchPattern, &wfd );
+
+	// Ensure that first item was found
+	if( hFind != INVALID_HANDLE_VALUE )
+	{
+		// Successfully found first item
+
+		// Allocate string memory
+		LPTSTR lpszFoundItemPath = new char[ STRING_LENGTH ];
+
+		// Loop through all items
+		do
+		{
+			// See if found item is a file
+			if( !( wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) )
+			{
+				// Found item is a file
+
+				// Copy parent folder path into found item path
+				lstrcpy( lpszFoundItemPath, lpszParentFolderPath );
+
+				// Append found item name onto found item path
+				lstrcat( lpszFoundItemPath, wfd.cFileName );
+
+				// Add found item path onto list box window
+				SendMessage( g_hWndListBox, LB_ADDSTRING, ( WPARAM )NULL, ( LPARAM )lpszFoundItemPath );
+
+				// Update return value
+				nResult ++;
+
+			} // End of found item is a file
+
+		} while( FindNextFile( hFind, &wfd )!=0 ); // End of loop through all items
+
+		// Update list box window
+		UpdateWindow( g_hWndListBox );
+
+		// Close file find
+		FindClose( hFind );
+
+		// Free string memory
+		delete [] lpszFoundItemPath;
+
+	} // End of successfully found first item
+
+	// Now that files in the currend folder have been added, scan for sub-folders
+
+	// Copy parent folder path into full search pattern
+	lstrcpy( lpszFullSearchPattern, lpszParentFolderPath );
+
+	// Append all files filter onto full search pattern
+	lstrcat( lpszFullSearchPattern, ALL_FILES_FILTER );
 
 	// Find first item
 	hFind = FindFirstFile( lpszFullSearchPattern, &wfd );
@@ -212,28 +268,8 @@ int ListBoxWindowPopulate( LPCTSTR lpszFolderPath, LPCTSTR lpszFileFilter, BOOL(
 				} // End of found item is not dots
 
 			} // End of found item is a folder
-			else
-			{
-				// Found item is a file
-
-				// Copy parent folder path into found item path
-				lstrcpy( lpszFoundItemPath, lpszParentFolderPath );
-
-				// Append found item name onto found item path
-				lstrcat( lpszFoundItemPath, wfd.cFileName );
-
-				// Add found item path onto list box window
-				SendMessage( g_hWndListBox, LB_ADDSTRING, ( WPARAM )NULL, ( LPARAM )lpszFoundItemPath );
-
-				// Update return value
-				nResult ++;
-
-			} // End of found item is a file
 
 		} while( FindNextFile( hFind, &wfd )!=0 ); // End of loop through all items
-
-		// Update list box window
-		UpdateWindow( g_hWndListBox );
 
 		// Close file find
 		FindClose( hFind );
