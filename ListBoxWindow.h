@@ -14,6 +14,8 @@
 #define LIST_BOX_WINDOW_STYLE													( WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL | WS_BORDER | LBS_NOINTEGRALHEIGHT | LBS_NOTIFY )
 #define LIST_BOX_WINDOW_TEXT													NULL
 
+#define LIST_BOX_WINDOW_DEFAULT_SAVE_FILE_NAME									"Save.txt"
+
 #define LIST_BOX_WINDOW_POPULATE_STATUS_MESSAGE_FORMAT_STRING					"%s (%d files)"
 #define LIST_BOX_WINDOW_SAVE_STATUS_MESSAGE_FORMAT_STRING						"Successfully saved %s (%d files)"
 
@@ -34,6 +36,8 @@ BOOL ListBoxWindowHandleCommandMessage( WPARAM wParam, LPARAM lParam, void( *lpD
 BOOL ListBoxWindowMove( int nX, int nY, int nWidth, int nHeight, BOOL bRepaint = TRUE );
 
 int ListBoxWindowPopulate( LPCTSTR lpszFolderPath, LPCTSTR lpszFileFilter, BOOL( *lpStatusFunction )( LPCTSTR lpszStatusMessage ) );
+
+int ListBoxWindowSave( BOOL( *lpStatusFunction )( LPCTSTR lpszStatusMessage ) );
 
 int ListBoxWindowSave( LPCTSTR lpszFileName, BOOL( *lpStatusFunction )( LPCTSTR lpszStatusMessage ) );
 

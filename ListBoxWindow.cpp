@@ -283,6 +283,59 @@ int ListBoxWindowPopulate( LPCTSTR lpszFolderPath, LPCTSTR lpszFileFilter, BOOL(
 
 } // End of function ListBoxWindowPopulate
 
+int ListBoxWindowSave( BOOL( *lpStatusFunction )( LPCTSTR lpszStatusMessage ) )
+{
+	int nResult = 0;
+
+	OPENFILENAME ofn;
+
+	// Allocate string memory
+	LPTSTR lpszFileName = new char[ STRING_LENGTH ];
+
+	// Initialise file name
+	lstrcpy( lpszFileName, LIST_BOX_WINDOW_DEFAULT_SAVE_FILE_NAME );
+
+	// Clear open file name structure
+	ZeroMemory( &ofn, sizeof( ofn ) );
+
+	// Initialise open file name structure
+	ofn.lStructSize		= sizeof( ofn );
+	ofn.hwndOwner		= NULL;
+	ofn.lpstrFilter		= SAVE_FILE_FILTER;
+	ofn.lpstrFile		= lpszFileName;
+	ofn.nMaxFile		= STRING_LENGTH;
+	ofn.Flags			= ( OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT );
+	ofn.lpstrDefExt		= SAVE_FILE_DEFAULT_EXTENSION;
+
+	// Get save file name
+	if( GetSaveFileName( &ofn ) )
+	{
+		// Successfully got save file name
+
+		// Allocate string memory
+		LPTSTR lpszStatusMessage = new char[ STRING_LENGTH ];
+
+		// Save file
+		nResult = ListBoxWindowSave( lpszFileName, lpStatusFunction );
+
+		// Format status message
+		wsprintf( lpszStatusMessage, LIST_BOX_WINDOW_SAVE_STATUS_MESSAGE_FORMAT_STRING, lpszFileName, nResult );
+
+		// Show status message
+		( *lpStatusFunction )( lpszStatusMessage );
+
+		// Free string memory
+		delete [] lpszStatusMessage;
+
+	} // End of successfully got save file name
+	
+	// Free string memory
+	delete [] lpszFileName;
+
+	return nResult;
+
+} // End of function ListBoxWindowSave
+
 int ListBoxWindowSave( LPCTSTR lpszFileName, BOOL( *lpStatusFunction )( LPCTSTR lpszStatusMessage ) )
 {
 	int nResult = 0;

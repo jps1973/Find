@@ -476,13 +476,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPTSTR, int nCmdShow )
 			StatusBarWindowSetText( lpszStatusMessage );
 
 			// Save list box window
-			nItemCount = ListBoxWindowSave( "Save.txt", &StatusBarWindowSetText );
-
-			// Format status message
-			wsprintf( lpszStatusMessage, LIST_BOX_WINDOW_SAVE_STATUS_MESSAGE_FORMAT_STRING, "Save.txt", nItemCount );
-
-			// Show status message on status bar window
-			StatusBarWindowSetText( lpszStatusMessage );
+			nItemCount = ListBoxWindowSave( &StatusBarWindowSetText );
 
 			// Message loop
 			while( GetMessage( &msg, NULL, 0, 0 ) > 0 )
