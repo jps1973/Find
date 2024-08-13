@@ -46,6 +46,70 @@ int ListBoxWindowGetCurrentSelection()
 
 } // End of function ListBoxWindowGetCurrentSelection
 
+BOOL ListBoxWindowGetInitialFileName( LPTSTR lpszInitialFileName )
+{
+	BOOL bResult = FALSE;
+
+	// Allocate string memory
+	LPTSTR lpszFolderPath = new char[ STRING_LENGTH ];
+
+	// Get current folder path
+	if( GetCurrentDirectory( STRING_LENGTH, lpszFolderPath ) )
+	{
+		// Succesfully got current folder path
+		LPTSTR lpszLastBackSlash;
+		SYSTEMTIME st;
+
+		// Allocate string memory
+		LPTSTR lpszFolderName = new char[ STRING_LENGTH ];
+
+		// Remove any back-slash characters from end of folder path
+		while( lpszFolderPath[ lstrlen( lpszFolderPath ) - sizeof( char ) ] == ASCII_BACK_SLASH_CHARACTER )
+		{
+			// Remove back-slash character from end of folder path
+			lpszFolderPath[ lstrlen( lpszFolderPath ) - sizeof( char ) ] = ( char )NULL;
+
+		}; // End of loop to remove any back-slash characters from end of folder path
+
+		// Find last back-slash character in folder path
+		lpszLastBackSlash = strrchr( lpszFolderPath, ASCII_BACK_SLASH_CHARACTER );
+
+		// See if last back-slash character was found in folder path
+		if( lpszLastBackSlash )
+		{
+			// Successfully found last back-slash character in folder path
+
+			// Use text after last back-slash for folder name
+			lstrcpy( lpszFolderName, ( lpszLastBackSlash + sizeof( char ) ) );
+
+		} // End of successfully found last back-slash character in folder path
+		else
+		{
+			// Unable to find last back-slash character in folder path
+
+			// Format folder name (assume folder is a drive)
+			wsprintf( lpszFolderName, LIST_BOX_WINDOW_DRIVE_FORMAT_STRING, lpszFolderPath[ 0 ] );
+
+		} // End of unable to find last back-slash character in folder path
+
+		// Get system time
+		GetLocalTime( &st );
+
+		// Format initial file name
+		wsprintf( lpszInitialFileName, LIST_BOX_WINDOW_INITIAL_FILE_NAME_FORMAT_STRING, lpszFolderPath, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond );
+
+		// Free string memory
+		delete [] lpszFolderName;
+
+	} // End of succesfully got current folder path
+
+	// Free string memory
+	delete [] lpszFolderPath;
+
+	return bResult;
+
+} // End of functionListBoxWindowGetInitialFileName
+
 int ListBoxWindowGetItemText( int nWhichItem, LPTSTR lpszItemText )
 {
 	// Get item text
@@ -293,7 +357,7 @@ int ListBoxWindowSave( BOOL( *lpStatusFunction )( LPCTSTR lpszStatusMessage ) )
 	LPTSTR lpszFileName = new char[ STRING_LENGTH ];
 
 	// Initialise file name
-	lstrcpy( lpszFileName, LIST_BOX_WINDOW_DEFAULT_SAVE_FILE_NAME );
+	ListBoxWindowGetInitialFileName( lpszFileName );
 
 	// Clear open file name structure
 	ZeroMemory( &ofn, sizeof( ofn ) );

@@ -16,6 +16,9 @@
 
 #define LIST_BOX_WINDOW_DEFAULT_SAVE_FILE_NAME									"Save.txt"
 
+#define LIST_BOX_WINDOW_DRIVE_FORMAT_STRING										"%C Drive"
+#define LIST_BOX_WINDOW_INITIAL_FILE_NAME_FORMAT_STRING							"%s %04d%02d%02d%02d%02d%02d"
+
 #define LIST_BOX_WINDOW_POPULATE_STATUS_MESSAGE_FORMAT_STRING					"%s (%d files)"
 #define LIST_BOX_WINDOW_SAVE_STATUS_MESSAGE_FORMAT_STRING						"Successfully saved %s (%d files)"
 
@@ -26,6 +29,8 @@ int ListBoxWindowAddString( LPCTSTR lpszString );
 BOOL ListBoxWindowCreate( HWND hWndParent, HINSTANCE hInstance );
 
 int ListBoxWindowGetCurrentSelection();
+
+BOOL ListBoxWindowGetInitialFileName( LPTSTR lpszInitialFileName );
 
 int ListBoxWindowGetItemText( int nWhichItem, LPTSTR lpszItemText );
 
