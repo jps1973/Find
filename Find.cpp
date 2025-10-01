@@ -1,6 +1,6 @@
-// Template.cpp
+// Find.cpp
 
-#include "Template.h"
+#include "Find.h"
 
 int ShowAboutMessage( HWND hWndParent )
 {
@@ -338,30 +338,8 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMsg, WPARAM wParam, L
 		{
 			// A close message
 
-			// Save file
-			if( ListBoxWindowSave( TEMPLATE_FILE_NAME ) )
-			{
-				// Successfully saved file
-
-				// Destroy main window
-				DestroyWindow( hWndMain );
-
-			} // End of successfully saved file
-			else
-			{
-				// Unable to save file
-
-				// Ensure that user is ok to close
-				if( MessageBox( hWndMain, LIST_BOX_WINDOW_UNABLE_TO_SAVE_WARNING_MESSAGE, WARNING_MESSAGE_CAPTION, ( MB_YESNO | MB_DEFBUTTON2 | MB_ICONWARNING ) ) == IDYES )
-				{
-					// User is ok to close
-
-					// Destroy main window
-					DestroyWindow( hWndMain );
-
-				} // End of user is ok to close
-
-			} // End of unable to save file
+			// Destroy main window
+			DestroyWindow( hWndMain );
 
 			// Break out of switch
 			break;
@@ -439,7 +417,9 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 			int nItemCount;
 
 			// Allocate string memory
-			LPTSTR lpszStatusMessage = new char[ STRING_LENGTH + sizeof( char ) ];
+			LPTSTR lpszStatusMessage	= new char[ STRING_LENGTH + sizeof( char ) ];
+			LPTSTR lpszFolderPath		= new char[ STRING_LENGTH + sizeof( char ) ];
+			LPTSTR lpszFileFilter		= new char[ STRING_LENGTH + sizeof( char ) ];
 
 			// Get system menu
 			hMenuSystem = GetSystemMenu( hWndMain, FALSE );
@@ -457,37 +437,45 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 			if( lpszArgumentList )
 			{
 				// Successfully got argument list
-				int nWhichArgument;
-				int nSizeNeeded;
-				int nWideArgumentLength;
 
-				// Allocate string memory
-				LPTSTR lpszArgument = new char[ STRING_LENGTH + sizeof( char ) ];
-
-				// Loop through arguments
-				for( nWhichArgument = 1; nWhichArgument < nArgumentCount; nWhichArgument ++ )
+				// See if file filter argument was provided
+				if( nArgumentCount > 1 )
 				{
+					// File filter argument was provided
+					int nSizeNeeded;
+					int nWideArgumentLength;
+
 					// Get wide argument length
-					nWideArgumentLength = lstrlenW( lpszArgumentList[ nWhichArgument ] );
+					nWideArgumentLength = lstrlenW( lpszArgumentList[ FILE_FILTER_ARGUMENT ] );
 
 					// Get size required for argument
-					nSizeNeeded = WideCharToMultiByte( CP_UTF8, 0, lpszArgumentList[ nWhichArgument ], nWideArgumentLength, NULL, 0, NULL, NULL );
+					nSizeNeeded = WideCharToMultiByte( CP_UTF8, 0, lpszArgumentList[ FILE_FILTER_ARGUMENT ], nWideArgumentLength, NULL, 0, NULL, NULL );
 
-					// Convert argument to ansi
-					WideCharToMultiByte( CP_UTF8, 0, lpszArgumentList[ nWhichArgument ], nWideArgumentLength, lpszArgument, nSizeNeeded, NULL, NULL );
+					// Convert argument to ansi file filter
+					WideCharToMultiByte( CP_UTF8, 0, lpszArgumentList[ FILE_FILTER_ARGUMENT ], nWideArgumentLength, lpszFileFilter, nSizeNeeded, NULL, NULL );
 
-					// Terminate argument
-					lpszArgument[ nSizeNeeded ] = ( char )NULL;
+					// Terminate file filter
+					lpszFileFilter[ nSizeNeeded ] = ( char )NULL;
 
-					// Add argument to list box window
-					ListBoxWindowAddString( lpszArgument );
+				} // End of file filter argument was provided
+				else
+				{
+					// File filter argument was not provided
 
-				}; // End of loop through arguments
+					// Use default file filter
+					lstrcpy( lpszFileFilter, ALL_FILES_FILTER );
 
-				// Free string memory
-				delete [] lpszArgument;
+				} // End of file filter argument was not provided
 
 			} // End of successfully got argument list
+			else
+			{
+				// Unable to get argument list
+
+				// Use default file filter
+				lstrcpy( lpszFileFilter, ALL_FILES_FILTER );
+
+			} // End of unable to get argument list
 
 			// Show main window
 			ShowWindow( hWndMain, nCmdShow );
@@ -495,11 +483,14 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 			// Update main window
 			UpdateWindow( hWndMain );
 
-			// Populate list box window
-			nItemCount = ListBoxWindowPopulate( TEMPLATE_FILE_NAME );
+			// Get current folder
+			GetCurrentDirectory( STRING_LENGTH, lpszFolderPath );
+
+			// Find files in current folder
+			nItemCount = ListBoxWindowFindFiles( lpszFolderPath, lpszFileFilter );
 
 			// Format status message
-			wsprintf( lpszStatusMessage, LIST_BOX_WINDOW_POPULATE_STATUS_MESSAGE_FORMAT_STRING, TEMPLATE_FILE_NAME, nItemCount );
+			wsprintf( lpszStatusMessage, LIST_BOX_WINDOW_FIND_FILES_STATUS_MESSAGE_FORMAT_STRING, lpszFolderPath, lpszFileFilter, nItemCount );
 
 			// Show status message on status bar window
 			StatusBarWindowSetText( lpszStatusMessage );
@@ -517,6 +508,8 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 
 			// Free string memory
 			delete [] lpszStatusMessage;
+			delete [] lpszFolderPath;
+			delete [] lpszFileFilter;
 
 		} // End of successfully main created window
 		else

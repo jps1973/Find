@@ -1,0 +1,15 @@
+C:\Users\jimps\Dropbox\Documents\Code\Find\Ascii.h
+C:\Users\jimps\Dropbox\Documents\Code\Find\Common.h
+C:\Users\jimps\Dropbox\Documents\Code\Find\Find.cpp
+C:\Users\jimps\Dropbox\Documents\Code\Find\Find.exe
+C:\Users\jimps\Dropbox\Documents\Code\Find\Find.h
+C:\Users\jimps\Dropbox\Documents\Code\Find\Find.txt
+C:\Users\jimps\Dropbox\Documents\Code\Find\ListBoxWindow.cpp
+C:\Users\jimps\Dropbox\Documents\Code\Find\ListBoxWindow.h
+C:\Users\jimps\Dropbox\Documents\Code\Find\make.bat
+C:\Users\jimps\Dropbox\Documents\Code\Find\README.md
+C:\Users\jimps\Dropbox\Documents\Code\Find\Resource.h
+C:\Users\jimps\Dropbox\Documents\Code\Find\Resource.o
+C:\Users\jimps\Dropbox\Documents\Code\Find\Resource.rc
+C:\Users\jimps\Dropbox\Documents\Code\Find\StatusBarWindow.cpp
+C:\Users\jimps\Dropbox\Documents\Code\Find\StatusBarWindow.h

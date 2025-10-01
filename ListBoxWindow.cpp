@@ -39,6 +39,148 @@ BOOL ListBoxWindowCreate( HWND hWndParent, HINSTANCE hInstance )
 
 } // End of function ListBoxWindowCreate
 
+int ListBoxWindowFindFiles( LPCTSTR lpszFolderPath, LPCTSTR lpszFileFilter )
+{
+	int nResult = 0;
+
+	WIN32_FIND_DATA wfd;
+	HANDLE hFileFind;
+
+	// Allocate string memory
+	LPTSTR lpszParentFolderPath		= new char[ STRING_LENGTH + sizeof( char ) ];
+	LPTSTR lpszFullSearchPattern	= new char[ STRING_LENGTH + sizeof( char ) ];
+
+	// Store parent folder path
+	lstrcpy( lpszParentFolderPath, lpszFolderPath );
+
+	// Ensure that parent folder path ends with a back-slash
+	if( lpszParentFolderPath[ lstrlen( lpszParentFolderPath ) - sizeof( char ) ] != ASCII_BACK_SLASH_CHARACTER )
+	{
+		// Parent folder path does not end with a back-slash
+
+		// Append a back-slash onto parent folder path
+		lstrcat( lpszParentFolderPath, ASCII_BACK_SLASH_STRING );
+
+	} // End of parent folder path does not end with a back-slash
+
+	// Find files in current folder:
+
+	// Copy parent folder path into full search pattern
+	lstrcpy( lpszFullSearchPattern, lpszParentFolderPath );
+
+	// Append file filter onto full search pattern
+	lstrcat( lpszFullSearchPattern, lpszFileFilter );
+
+	// Find first item
+	hFileFind = FindFirstFile( lpszFullSearchPattern, &wfd );
+
+	// Ensure that first item was found
+	if( hFileFind != INVALID_HANDLE_VALUE )
+	{
+		// Successfully found first item
+
+		// Allocate string memory
+		LPTSTR lpszFoundItemPath = new char[ STRING_LENGTH + sizeof( char ) ];
+
+		// Loop through all items
+		do
+		{
+			// See if found item is a file
+			if( !( wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) )
+			{
+				// Found item is a file
+
+				// Copy parent folder path into found item path
+				lstrcpy( lpszFoundItemPath, lpszParentFolderPath );
+
+				// Append found item name onto found item path
+				lstrcat( lpszFoundItemPath, wfd.cFileName );
+
+				// Add found item path to list box window
+				if( SendMessage( g_hWndListBox, LB_ADDSTRING, ( WPARAM )NULL, ( LPARAM )lpszFoundItemPath) >= 0 )
+				{
+					// Successfully added found item path to list box window
+
+					// Update return value
+					nResult ++;
+
+				} // End of successfully added found item path to list box window
+
+			} // End of found item is a file
+
+		} while( FindNextFile( hFileFind, &wfd ) != 0 ); // End of loop through all items
+
+		// Close file find
+		FindClose( hFileFind );
+
+		// Free string memory
+		delete [] lpszFoundItemPath;
+
+	} // End of successfully found first item
+
+	// Find sub-folders of current folder:
+
+	// Copy parent folder path into full search pattern
+	lstrcpy( lpszFullSearchPattern, lpszParentFolderPath );
+
+	// Append all files filter onto full search pattern
+	lstrcat( lpszFullSearchPattern, ALL_FILES_FILTER );
+
+	// Find first item
+	hFileFind = FindFirstFile( lpszFullSearchPattern, &wfd );
+
+	// Ensure that first item was found
+	if( hFileFind != INVALID_HANDLE_VALUE )
+	{
+		// Successfully found first item
+
+		// Allocate string memory
+		LPTSTR lpszFoundItemPath = new char[ STRING_LENGTH + sizeof( char ) ];
+
+		// Loop through all items
+		do
+		{
+			// See if found item is a folder
+			if( wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
+			{
+				// Found item is a folder
+
+				// Ensure that found item is not dots
+				if( wfd.cFileName[ 0 ] != ASCII_FULL_STOP_CHARACTER )
+				{
+					// Found item is not dots
+
+					// Copy parent folder path into found item path
+					lstrcpy( lpszFoundItemPath, lpszParentFolderPath );
+
+					// Append found item name onto found item path
+					lstrcat( lpszFoundItemPath, wfd.cFileName );
+
+					// Search found folder for items
+					nResult += ListBoxWindowFindFiles( lpszFoundItemPath, lpszFileFilter );
+
+				} // End of found item is not dots
+
+			} // End of found item is a folder
+
+		} while( FindNextFile( hFileFind, &wfd ) != 0 ); // End of loop through all items
+
+		// Close file find
+		FindClose( hFileFind );
+
+		// Free string memory
+		delete [] lpszFoundItemPath;
+
+	} // End of successfully found first item
+
+	// Free string memory
+	delete [] lpszParentFolderPath;
+	delete [] lpszFullSearchPattern;
+
+	return nResult;
+
+} // End of function ListBoxWindowFindFiles
+
 BOOL ListBoxWindowGetRect( LPRECT lpRect )
 {
 	// Get list box window rect
