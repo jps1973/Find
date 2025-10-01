@@ -22,6 +22,9 @@
 //		{
 //			// Successfully opened item
 
+#define TEXT_FILE_FILTER														"Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0"
+#define TEXT_FILE_EXTENSION														"txt"
+
 #define UNABLE_TO_OPEN_FILE_ERROR_MESSAGE_FORMAT_STRING							"Unable to open '%s'"
 
 #define ABOUT_MESSAGE_CAPTION													"About"

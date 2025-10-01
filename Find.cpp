@@ -284,36 +284,9 @@ LRESULT CALLBACK MainWindowProcedure( HWND hWndMain, UINT uMsg, WPARAM wParam, L
 		case WM_NOTIFY:
 		{
 			// A notify message
-			LPNMHDR lpNmHdr;
 
-			// Get notify message handler
-			lpNmHdr = ( LPNMHDR )lParam;
-
-			// See if notify message is from list box window
-			if( IsListBoxWindow( lpNmHdr->hwndFrom ) )
-			{
-				// Notify message is from list box window
-
-				// Handle notify message from list box window
-				if( !( ListBoxWindowHandleNotifyMessage( wParam, lParam, &StatusBarWindowSetText ) ) )
-				{
-					// Notify message was not handled from list box window
-
-					// Call default procedure
-					lr = DefWindowProc( hWndMain, uMsg, wParam, lParam );
-
-				} // End of notify message was not handled from list box window
-
-			} // End of notify message is from list box window
-			else
-			{
-				// Notify message is not from list box window
-
-				// Call default procedure
-				lr = DefWindowProc( hWndMain, uMsg, wParam, lParam );
-
-			} // End of notify message is not from list box window
-
+			// Call default procedure
+			lr = DefWindowProc( hWndMain, uMsg, wParam, lParam );
 
 			// Break out of switch
 			break;
@@ -420,6 +393,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 			LPTSTR lpszStatusMessage	= new char[ STRING_LENGTH + sizeof( char ) ];
 			LPTSTR lpszFolderPath		= new char[ STRING_LENGTH + sizeof( char ) ];
 			LPTSTR lpszFileFilter		= new char[ STRING_LENGTH + sizeof( char ) ];
+			LPTSTR lpszSaveFileName		= new char[ STRING_LENGTH + sizeof( char ) ];
 
 			// Get system menu
 			hMenuSystem = GetSystemMenu( hWndMain, FALSE );
@@ -495,6 +469,22 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 			// Show status message on status bar window
 			StatusBarWindowSetText( lpszStatusMessage );
 
+			// Set default save file name
+			lstrcpy( lpszSaveFileName, FIND_FILE_NAME );
+
+			// Save list box window
+			if( ListBoxWindowSave( hWndMain, lpszSaveFileName ) )
+			{
+				// Successfully saved list box window
+
+				// Format status message
+				wsprintf( lpszStatusMessage, LIST_BOX_WINDOW_SAVED_FILE_STATUS_MESSAGE_FORMAT_STRING, lpszSaveFileName );
+
+				// Show status message on status bar window
+				StatusBarWindowSetText( lpszStatusMessage );
+
+			} // End of successfully saved list box window
+
 			// Message loop
 			while( GetMessage( &msg, NULL, 0, 0 ) > 0 )
 			{
@@ -510,6 +500,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 			delete [] lpszStatusMessage;
 			delete [] lpszFolderPath;
 			delete [] lpszFileFilter;
+			delete [] lpszSaveFileName;
 
 		} // End of successfully main created window
 		else

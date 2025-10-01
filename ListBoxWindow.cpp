@@ -268,35 +268,6 @@ BOOL ListBoxWindowHandleCommandMessage( WPARAM wParam, LPARAM, BOOL( *lpStatusFu
 
 } // End of function ListBoxWindowHandleCommandMessage
 
-BOOL ListBoxWindowHandleNotifyMessage( WPARAM, LPARAM lParam, BOOL( *lpStatusFunction )( LPCTSTR lpszItemText ) )
-{
-	BOOL bResult = FALSE;
-
-	LPNMHDR lpNmhdr;
-
-	// Get notify message handler
-	lpNmhdr = ( ( LPNMHDR )lParam );
-
-	// Select list box window notification code
-	switch( lpNmhdr->code )
-	{
-		default:
-		{
-			// Default notification code
-
-			// No need to do anything here, just continue with default result
-
-			// Break out of switch
-			break;
-
-		} // End of default notification code
-
-	}; // End of selection for list box window notification code
-
-	return bResult;
-
-} // End of function ListBoxWindowHandleNotifyMessage
-
 BOOL ListBoxWindowMove( int nX, int nY, int nWidth, int nHeight, BOOL bRepaint )
 {
 	// Move list box window
@@ -397,6 +368,38 @@ int ListBoxWindowPopulate( LPCTSTR lpszFileName )
 	return nResult;
 
 } // End of function ListBoxWindowPopulate
+
+int ListBoxWindowSave( HWND hWndParent, LPTSTR lpszFileName )
+{
+	int nResult = 0;
+
+	OPENFILENAME ofn;
+
+	// Clear open file name structure
+	ZeroMemory( &ofn, sizeof( ofn ) );
+
+	// Initialise open file name structure
+	ofn.lStructSize	= sizeof( ofn );
+	ofn.hwndOwner	= hWndParent;
+	ofn.lpstrFilter	= TEXT_FILE_FILTER;
+	ofn.lpstrFile	= lpszFileName;
+	ofn.nMaxFile	= STRING_LENGTH;
+	ofn.Flags		= ( OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY );
+	ofn.lpstrDefExt = TEXT_FILE_EXTENSION;
+
+	// Get save file name
+	if( GetSaveFileName( &ofn ) )
+	{
+		// Successfully got save file name
+
+		// Save list view window
+		nResult = ListBoxWindowSave( lpszFileName );
+
+	} // End of successfully got save file name
+
+	return nResult;
+
+} // End of function ListBoxWindowSave
 
 int ListBoxWindowSave( LPCTSTR lpszFileName )
 {
