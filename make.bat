@@ -9,6 +9,7 @@ g++ -mwindows -m64 -static -Wall -Wextra ^
  Find.cpp ^
  ^
  ListBoxWindow.cpp ^
+ SplashScreenWindow.cpp ^
  StatusBarWindow.cpp ^
  ^
  Resource.o ^

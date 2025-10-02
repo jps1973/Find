@@ -8,6 +8,7 @@
 #include "Resource.h"
 
 #include "ListBoxWindow.h"
+#include "SplashScreenWindow.h"
 #include "StatusBarWindow.h"
 
 #define MAIN_WINDOW_CLASS_NAME													"Main Find Window Class"

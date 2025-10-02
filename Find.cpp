@@ -353,6 +353,9 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 
 	WNDCLASSEX wcMain;
 
+	// Show splash screen
+	SplashScreenWindowShow( hInstance, ABOUT_MESSAGE_TEXT );
+
 	// Clear message structure
 	ZeroMemory( &msg, sizeof( msg ) );
 
