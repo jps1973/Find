@@ -369,7 +369,121 @@ int ListBoxWindowPopulate( LPCTSTR lpszFileName )
 
 } // End of function ListBoxWindowPopulate
 
-int ListBoxWindowSave( HWND hWndParent, LPTSTR lpszFileName )
+int ListBoxWindowSaveHtml( HWND hWndParent, LPCTSTR lpszParentFolderPath, LPCTSTR lpszFileFilter, LPTSTR lpszFileName )
+{
+	int nResult = 0;
+
+	OPENFILENAME ofn;
+
+	// Clear open file name structure
+	ZeroMemory( &ofn, sizeof( ofn ) );
+
+	// Initialise open file name structure
+	ofn.lStructSize	= sizeof( ofn );
+	ofn.hwndOwner	= hWndParent;
+	ofn.lpstrFilter	= HTML_FILE_FILTER;
+	ofn.lpstrFile	= lpszFileName;
+	ofn.nMaxFile	= STRING_LENGTH;
+	ofn.Flags		= ( OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_HIDEREADONLY );
+	ofn.lpstrDefExt = HTML_FILE_EXTENSION;
+
+	// Get save file name
+	if( GetSaveFileName( &ofn ) )
+	{
+		// Successfully got save file name
+
+		// Save list view window
+		nResult = ListBoxWindowSaveHtml( lpszParentFolderPath, lpszFileFilter, lpszFileName );
+
+	} // End of successfully got save file name
+
+	return nResult;
+
+} // End of function ListBoxWindowSaveHtml
+
+int ListBoxWindowSaveHtml( LPCTSTR lpszParentFolderPath, LPCTSTR lpszFileFilter, LPCTSTR lpszFileName )
+{
+	int nResult = 0;
+
+	HANDLE hFile;
+
+	// Create file
+	hFile = CreateFile( lpszFileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
+
+	// Ensure that file was created
+	if( hFile != INVALID_HANDLE_VALUE )
+	{
+		// Successfully created file
+
+		// Allocate string memory
+		LPTSTR lpszHtmlFileHeader = new char[ STRING_LENGTH + sizeof( char ) ];
+
+		// Format html file header
+		wsprintf( lpszHtmlFileHeader, LIST_BOX_WINDOW_HTML_FILE_HEADER_FORMAT_STRING, lpszParentFolderPath, lpszFileFilter, lpszParentFolderPath, lpszFileFilter );
+
+		// Write  html file header to file
+		if( WriteFile( hFile, lpszHtmlFileHeader, lstrlen( lpszHtmlFileHeader ), NULL, NULL ) )
+		{
+			// Successfully wrote  html file header to file
+			int nItemCount;
+			int nWhichItem;
+
+			// Allocate string memory
+			LPTSTR lpszItemText = new char[ STRING_LENGTH + sizeof( char ) ];
+
+			// Count items on list box window
+			nItemCount = SendMessage( g_hWndListBox, LB_GETCOUNT, ( WPARAM )NULL, ( LPARAM )NULL );
+
+			// Loop through items on list box window
+			for( nWhichItem = 0; nWhichItem < nItemCount; nWhichItem ++ )
+			{
+				// Get item text
+				if( SendMessage( g_hWndListBox, LB_GETTEXT, ( WPARAM )nWhichItem, ( LPARAM )lpszItemText) != LB_ERR )
+				{
+					// Successfully got item text
+
+					// Write item text to file
+					WriteFile( hFile, lpszItemText, lstrlen( lpszItemText ), NULL, NULL );
+
+					// Write new line text to file
+					WriteFile( hFile, LIST_BOX_WINDOW_HTML_FILE_NEW_LINE_TEXT, lstrlen( LIST_BOX_WINDOW_HTML_FILE_NEW_LINE_TEXT ), NULL, NULL );
+
+					// Update return value
+					nResult ++;
+
+				} // End of successfully got item text
+				else
+				{
+					// Unable to get item text
+
+					// Force exit from loop
+					nWhichItem = nItemCount;
+
+				} // End of unable to get item text
+
+			}; // End of loop through items on list box window
+
+			// Write html file footer to file
+			WriteFile( hFile, LIST_BOX_WINDOW_HTML_FILE_FOOTER, lstrlen( LIST_BOX_WINDOW_HTML_FILE_FOOTER ), NULL, NULL );
+
+			// Free string memory
+			delete [] lpszItemText;
+
+		} // End of successfully wrote  html file header to file
+
+		// Free string memory
+		delete [] lpszHtmlFileHeader;
+
+		// Close file
+		CloseHandle( hFile );
+
+	} // End of successfully created file
+
+	return nResult;
+
+} // End of function ListBoxWindowSaveHtml
+
+int ListBoxWindowSaveText( HWND hWndParent, LPTSTR lpszFileName )
 {
 	int nResult = 0;
 
@@ -393,15 +507,15 @@ int ListBoxWindowSave( HWND hWndParent, LPTSTR lpszFileName )
 		// Successfully got save file name
 
 		// Save list view window
-		nResult = ListBoxWindowSave( lpszFileName );
+		nResult = ListBoxWindowSaveText( lpszFileName );
 
 	} // End of successfully got save file name
 
 	return nResult;
 
-} // End of function ListBoxWindowSave
+} // End of function ListBoxWindowSaveText
 
-int ListBoxWindowSave( LPCTSTR lpszFileName )
+int ListBoxWindowSaveText( LPCTSTR lpszFileName )
 {
 	int nResult = 0;
 
@@ -474,7 +588,7 @@ int ListBoxWindowSave( LPCTSTR lpszFileName )
 
 	return nResult;
 
-} // End of function ListBoxWindowSave
+} // End of function ListBoxWindowSaveText
 
 HWND ListBoxWindowSetFocus()
 {

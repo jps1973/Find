@@ -31,7 +31,7 @@
 #define SYSTEM_MENU_ABOUT_ITEM_POSITION											6
 #define SYSTEM_MENU_ABOUT_ITEM_TEXT												"About"
 
-#define FIND_FILE_NAME															"Find.txt"
+#define FIND_FILE_NAME															"Find.html"
 
 #define FILE_FILTER_ARGUMENT													1
 

@@ -14,6 +14,16 @@
 #define LIST_BOX_WINDOW_STYLE													( WS_CHILD | WS_VISIBLE | WS_HSCROLL | WS_VSCROLL | WS_BORDER | LBS_NOINTEGRALHEIGHT | LBS_NOTIFY )
 #define LIST_BOX_WINDOW_TEXT													NULL
 
+#define LIST_BOX_WINDOW_HTML_FILE_HEADER_FORMAT_STRING							"<head>\r\n"					\
+																				"<title>%s (%s)</title>\r\n"		\
+																				"</head>\r\n"					\
+																				"<body>\r\n"					\
+																				"<h1>%s (%s)</h1>\r\n"
+
+#define LIST_BOX_WINDOW_HTML_FILE_FOOTER										"</body>\r\n"
+
+#define LIST_BOX_WINDOW_HTML_FILE_NEW_LINE_TEXT									"<br />\r\n"
+
 #define LIST_BOX_WINDOW_FIND_FILES_STATUS_MESSAGE_FORMAT_STRING					"%s (%s) - %d files"
 #define LIST_BOX_WINDOW_SAVED_FILE_STATUS_MESSAGE_FORMAT_STRING					"Saved to %s"
 
@@ -37,9 +47,13 @@ int ListBoxWindowLoad( LPCTSTR lpszFileName );
 
 int ListBoxWindowPopulate( LPCTSTR lpszFileName );
 
-int ListBoxWindowSave( HWND hWndParent, LPTSTR lpszFileName );
+int ListBoxWindowSaveHtml( HWND hWndParent, LPCTSTR lpszParentFolderPath, LPCTSTR lpszFileFilter, LPTSTR lpszFileName );
 
-int ListBoxWindowSave( LPCTSTR lpszFileName );
+int ListBoxWindowSaveHtml( LPCTSTR lpszParentFolderPath, LPCTSTR lpszFileFilter, LPCTSTR lpszFileName );
+
+int ListBoxWindowSaveText( HWND hWndParent, LPTSTR lpszFileName );
+
+int ListBoxWindowSaveText( LPCTSTR lpszFileName );
 
 HWND ListBoxWindowSetFocus();
 

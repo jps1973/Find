@@ -473,7 +473,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 			lstrcpy( lpszSaveFileName, FIND_FILE_NAME );
 
 			// Save list box window
-			if( ListBoxWindowSave( hWndMain, lpszSaveFileName ) )
+			if( ListBoxWindowSaveHtml( hWndMain, lpszFolderPath, lpszFileFilter, lpszSaveFileName ) )
 			{
 				// Successfully saved list box window
 
@@ -482,6 +482,9 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow )
 
 				// Show status message on status bar window
 				StatusBarWindowSetText( lpszStatusMessage );
+
+				// Open saved file
+				ShellExecute( hWndMain, SHELL_EXECUTE_OPEN_COMMAND, lpszSaveFileName, NULL, NULL, SW_SHOWNORMAL );
 
 			} // End of successfully saved list box window
 

@@ -22,6 +22,9 @@
 //		{
 //			// Successfully opened item
 
+#define HTML_FILE_FILTER														"Hypertext Files (*.html)\0*.html\0All Files (*.*)\0*.*\0"
+#define HTML_FILE_EXTENSION														"html"
+
 #define TEXT_FILE_FILTER														"Text Files (*.txt)\0*.txt\0All Files (*.*)\0*.*\0"
 #define TEXT_FILE_EXTENSION														"txt"
 
